@@ -1,0 +1,46 @@
+name: setupmatch
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-setupmatch}
+      POSTGRES_USER: ${POSTGRES_USER:-setupmatch}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-setupmatch}
+    volumes:
+      - setupmatch_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-setupmatch} -d ${POSTGRES_DB:-setupmatch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/setupmatch}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-setupmatch}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-setupmatch}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "4200:80"
+
+volumes:
+  setupmatch_pgdata:

@@ -1,0 +1,136 @@
+@use '@angular/material' as mat;
+@use './styles/tokens';
+@use './styles/form-pills';
+
+@include mat.core();
+
+$setupmatch-primary: mat.m2-define-palette((
+  50: #e8f3ff,
+  100: #c5e4ff,
+  200: #9ed0ff,
+  300: #6eb8ff,
+  400: #3d9dff,
+  500: #0075eb,
+  600: #0060c7,
+  700: #004da3,
+  800: #003a7a,
+  900: #002952,
+  contrast: (
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+  )
+));
+
+$setupmatch-accent: mat.m2-define-palette((
+  50: #f4f5f7,
+  100: #eceff4,
+  200: #e2e8f0,
+  300: #c5cad3,
+  400: #8b8d94,
+  500: #1a1d21,
+  600: #1a1d21,
+  700: #1a1d21,
+  800: #1a1d21,
+  900: #1a1d21,
+  contrast: (
+    50: #1a1d21,
+    100: #1a1d21,
+    200: #1a1d21,
+    300: #ffffff,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  )
+));
+
+$setupmatch-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $setupmatch-primary,
+    accent: $setupmatch-accent,
+    warn: mat.m2-define-palette(mat.$m2-red-palette, 600),
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, system-ui, sans-serif'
+  ),
+  density: 0,
+));
+
+@include mat.all-component-themes($setupmatch-theme);
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.01em;
+  box-shadow: var(--shadow-sm);
+}
+
+.mat-mdc-outlined-button {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border);
+}
+
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-icon-button {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.app-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+}
+
+.page-content {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .app-card {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.success-snackbar {
+  --mdc-snackbar-container-color: #1a1d21;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+}

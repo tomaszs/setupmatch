@@ -1,0 +1,16 @@
+INSERT INTO equipment (id, type, brand, model, state, condition_score, purchase_date) VALUES
+('11111111-1111-1111-1111-111111110001', 'main_computer', 'Apple', 'MacBook Pro 14', 'available', 0.950, '2024-06-01'),
+('11111111-1111-1111-1111-111111110002', 'main_computer', 'Apple', 'MacBook Air M2', 'available', 0.880, '2023-11-15'),
+('11111111-1111-1111-1111-111111110003', 'main_computer', 'Dell', 'Latitude 7440', 'available', 0.820, '2024-02-20'),
+('11111111-1111-1111-1111-111111110004', 'main_computer', 'Lenovo', 'ThinkPad T14', 'available', 0.750, '2022-08-10'),
+('22222222-2222-2222-2222-222222220001', 'monitor', 'Dell', 'U2723QE', 'available', 0.900, '2024-01-10'),
+('22222222-2222-2222-2222-222222220002', 'monitor', 'LG', '27UP850', 'available', 0.850, '2023-09-05'),
+('22222222-2222-2222-2222-222222220003', 'monitor', 'Samsung', 'S27A600', 'available', 0.750, '2023-04-12'),
+('22222222-2222-2222-2222-222222220004', 'monitor', 'AOC', 'Q27P2C', 'available', 0.700, '2022-12-01'),
+('33333333-3333-3333-3333-333333330001', 'keyboard', 'Apple', 'Magic Keyboard', 'available', 0.920, '2024-03-01'),
+('33333333-3333-3333-3333-333333330002', 'keyboard', 'Logitech', 'MX Keys', 'available', 0.880, '2023-07-20'),
+('33333333-3333-3333-3333-333333330003', 'keyboard', 'Keychron', 'K2 Pro', 'available', 0.800, '2023-01-15'),
+('33333333-3333-3333-3333-333333330004', 'keyboard', 'Microsoft', 'Ergonomic', 'available', 0.720, '2022-05-10'),
+('44444444-4444-4444-4444-444444440001', 'mouse', 'Logitech', 'MX Master 3S', 'available', 0.910, '2024-05-01'),
+('44444444-4444-4444-4444-444444440002', 'mouse', 'Apple', 'Magic Mouse', 'available', 0.850, '2023-10-12'),
+('44444444-4444-4444-4444-444444440003', 'mouse', 'Razer', 'Pro Click', 'available', 0.780, '2022-11-08');

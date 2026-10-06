@@ -1,0 +1,133 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mono-input {
+  font-family: var(--font-mono);
+}
+
+.policy-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+
+.policy-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.policy-error {
+  color: var(--color-error-text);
+  margin: 0 0 16px;
+}
+
+.slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.slot-card {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.slot-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.slot-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.slot-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.brand-input {
+  width: 100%;
+  max-width: 240px;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.actions button {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .actions button {
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .page-header a {
+    width: 100%;
+  }
+
+  .policy-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .policy-header button {
+    width: 100%;
+  }
+
+  .brand-input {
+    max-width: none;
+  }
+}

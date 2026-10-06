@@ -1,0 +1,107 @@
+<h2 mat-dialog-title>Register equipment</h2>
+
+<mat-dialog-content>
+  @if (submitting) {
+    <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+  }
+
+  <form class="register-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="register-field">
+      <span class="field-label">Type</span>
+      <div class="pill-row">
+        @for (type of equipmentTypes; track type) {
+          <button
+            type="button"
+            class="pill"
+            [class.pill-active]="form.controls.type.value === type"
+            (click)="setType(type)"
+          >
+            {{ typeLabel(type) }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="register-field">
+      <span class="field-label">Brand</span>
+      <mat-form-field appearance="outline" class="register-input">
+        <mat-label>Brand</mat-label>
+        <input matInput formControlName="brand" />
+        @if (fieldError('brand')) {
+          <mat-error>{{ fieldError('brand') }}</mat-error>
+        }
+      </mat-form-field>
+      @if (brandPills().length > 0) {
+        <div class="pill-row">
+          @for (brand of brandPills(); track brand) {
+            <button
+              type="button"
+              class="pill"
+              [class.pill-active]="form.controls.brand.value === brand"
+              (click)="setBrand(brand)"
+            >
+              {{ brand }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="register-field">
+      <span class="field-label">Model</span>
+      <mat-form-field appearance="outline" class="register-input">
+        <mat-label>Model</mat-label>
+        <input matInput formControlName="model" />
+        @if (fieldError('model')) {
+          <mat-error>{{ fieldError('model') }}</mat-error>
+        }
+      </mat-form-field>
+      @if (modelPills().length > 0) {
+        <div class="pill-row">
+          @for (model of modelPills(); track model) {
+            <button
+              type="button"
+              class="pill"
+              [class.pill-active]="form.controls.model.value === model"
+              (click)="setModel(model)"
+            >
+              {{ model }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="register-field">
+      <span class="field-label">Condition score</span>
+      <app-condition-score-field formControlName="condition_score" label="Condition score" />
+      @if (fieldError('condition_score')) {
+        <p class="field-error">{{ fieldError('condition_score') }}</p>
+      }
+    </div>
+
+    <div class="register-field">
+      <span class="field-label">Purchase date</span>
+      <mat-form-field appearance="outline" class="register-input register-date">
+        <mat-label>Purchase date</mat-label>
+        <input matInput [matDatepicker]="purchaseDatePicker" formControlName="purchase_date" />
+        <mat-datepicker-toggle matIconSuffix [for]="purchaseDatePicker" />
+        <mat-datepicker #purchaseDatePicker />
+        @if (fieldError('purchase_date')) {
+          <mat-error>{{ fieldError('purchase_date') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close [disabled]="submitting">Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="submitting" (click)="submit()">
+    @if (submitting) {
+      Registering...
+    } @else {
+      Register
+    }
+  </button>
+</mat-dialog-actions>

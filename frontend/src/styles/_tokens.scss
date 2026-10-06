@@ -1,0 +1,28 @@
+:root {
+  --color-primary: #0075eb;
+  --color-primary-hover: #0060c7;
+  --color-primary-soft: #e8f3ff;
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eceff4;
+  --color-border: #e2e8f0;
+  --color-text: #1a1d21;
+  --color-text-secondary: #5c5c5c;
+  --color-text-muted: #8b8d94;
+  --color-success-bg: #e8faf1;
+  --color-success-text: #0d8050;
+  --color-error-bg: #fde8ee;
+  --color-error-text: #d32f5a;
+  --color-warning-bg: #fff4e5;
+  --color-warning-text: #b85c00;
+  --color-info-bg: #e8f3ff;
+  --color-info-text: #0075eb;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(26, 29, 33, 0.06);
+  --shadow-md: 0 4px 20px rgba(26, 29, 33, 0.08);
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "setupmatch-e2e",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "playwright test",
+    "test:clean": "cd .. && docker compose down -v && docker compose up -d --wait && playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}

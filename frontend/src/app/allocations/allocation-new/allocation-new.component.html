@@ -1,0 +1,121 @@
+<div class="page-content" [@fadeIn]>
+  <div class="page-header">
+    <div>
+      <p class="section-label">02 ALLOCATIONS</p>
+      <h1>New allocation request</h1>
+      <p class="subtitle">Define employee ID and equipment policy slots.</p>
+    </div>
+    <a mat-stroked-button routerLink="/allocations">Back to list</a>
+  </div>
+
+  <section class="app-card" [@fadeCard]>
+    @if (submitting) {
+      <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Employee ID</mat-label>
+        <input
+          matInput
+          formControlName="employee_id"
+          class="mono-input"
+          [matAutocomplete]="employeeAutocomplete"
+          placeholder="e.g. emp-001"
+        />
+        <mat-autocomplete #employeeAutocomplete="matAutocomplete">
+          @for (employeeId of employeeSuggestions(); track employeeId) {
+            <mat-option [value]="employeeId">{{ employeeId }}</mat-option>
+          }
+        </mat-autocomplete>
+        @if (fieldError('employee_id')) {
+          <mat-error>{{ fieldError('employee_id') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="policy-header">
+        <h2>Policy slots</h2>
+        <button mat-stroked-button type="button" (click)="addSlot()">Add slot</button>
+      </div>
+
+      @if (fieldError('policy')) {
+        <p class="policy-error">{{ fieldError('policy') }}</p>
+      }
+
+      <div formArrayName="policy" class="slot-list" [@slotList]="policySlots.length">
+        @for (slot of policySlots.controls; track $index; let i = $index) {
+          <div class="slot-card" [formGroupName]="i" [@slotItem]>
+            <div class="slot-card-header">
+              <div class="slot-badge">Slot {{ i + 1 }}</div>
+              <button
+                mat-icon-button
+                type="button"
+                class="remove-slot-btn"
+                aria-label="Remove slot"
+                [disabled]="policySlots.length <= 1"
+                (click)="removeSlot(i)"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+            <div class="slot-fields">
+              <div class="slot-field">
+                <span class="field-label">Type</span>
+                <div class="pill-row">
+                  @for (type of equipmentTypes; track type) {
+                    <button
+                      type="button"
+                      class="pill"
+                      [class.pill-active]="slotGroup(i).controls.type.value === type"
+                      (click)="setSlotType(i, type)"
+                    >
+                      {{ typeLabels[type] }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="slot-field">
+                <span class="field-label">Min condition</span>
+                <app-condition-score-field formControlName="min_condition" />
+              </div>
+
+              <div class="slot-field">
+                <span class="field-label">Preferred brand</span>
+                <mat-form-field appearance="outline" class="brand-input">
+                  <mat-label>Brand</mat-label>
+                  <input matInput formControlName="preferred_brand" placeholder="Optional" />
+                </mat-form-field>
+                @if (brandPills(i).length > 0) {
+                  <div class="pill-row">
+                    @for (brand of brandPills(i); track brand) {
+                      <button
+                        type="button"
+                        class="pill"
+                        [class.pill-active]="slotGroup(i).controls.preferred_brand.value === brand"
+                        (click)="setPreferredBrand(i, brand)"
+                      >
+                        {{ brand }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+          @if (submitting) {
+            Submitting...
+          } @else {
+            Submit request
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

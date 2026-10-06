@@ -1,0 +1,134 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.filter-field {
+  flex: 1 1 160px;
+  min-width: min(100%, 160px);
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 56px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  min-width: 640px;
+}
+
+th.mat-mdc-header-cell {
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+tr.mat-mdc-row:hover {
+  background: var(--color-primary-soft);
+}
+
+.retired-row {
+  opacity: 0.65;
+}
+
+.retired-model {
+  text-decoration: line-through;
+}
+
+.condition-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.condition-bar {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.condition-fill {
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--color-text-muted);
+}
+
+.register-fab {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 100;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 767px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-field,
+  .filter-toggle {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .filter-toggle {
+    padding: 4px 0;
+  }
+
+  .register-fab {
+    bottom: 16px;
+    left: 16px;
+  }
+}
