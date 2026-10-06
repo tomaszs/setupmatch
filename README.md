@@ -1,14 +1,36 @@
-# Setup Match
+# SetupMatch
 
-IT equipment inventory and role-based allocation for operations teams.
+[![Website](https://img.shields.io/badge/website-setupmatch.cloud-635BFF)](https://setupmatch.cloud)
+[![License](https://img.shields.io/badge/license-proprietary-lightgrey)](LICENSE)
 
-**Repository:** https://github.com/tomaszs/setupmatch (private)
+**SetupMatch** is open-source software for IT teams that need to track equipment inventory and assign full kits to employees. Register laptops, monitors, docks, and accessories, define role-based policies, and run global matching that picks the best complete kit from available stock.
+
+**Live product site:** [setupmatch.cloud](https://setupmatch.cloud)
+
+## Why SetupMatch
+
+Spreadsheets break down as headcount grows. SetupMatch gives operations teams one place to:
+
+- see what is available, reserved, assigned, or retired
+- define kit policies per role or department
+- match new hires to hardware with condition and brand rules
+- confirm or cancel allocations without losing inventory truth
+
+## Features
+
+| Area | What you get |
+|------|----------------|
+| **Inventory** | Register equipment, filter by type and state, retire units |
+| **Allocations** | Build a policy per employee, run matching, confirm or cancel |
+| **Matching** | Global kit assignment (not greedy per-slot picking) with Hungarian algorithm |
+| **States** | `available` → `reserved` → `assigned`, plus retire and cancel flows |
 
 ## Quick start
 
-Prerequisites: Docker Desktop (or Docker Engine + Compose v2).
+Requires Docker Desktop (or Docker Engine + Compose v2).
 
 ```powershell
+git clone https://github.com/tomaszs/setupmatch.git
 cd setupmatch
 docker compose up --build
 ```
@@ -20,7 +42,7 @@ docker compose up --build
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Postgres | localhost:5432 (user/password/db: `setupmatch`) |
 
-Seed data loads automatically via Flyway (`V2__seed.sql`): 15 items across all four equipment types.
+Seed data loads automatically via Flyway (`V2__seed.sql`): 15 items across all equipment types.
 
 Copy `.env.example` to `.env` to override compose defaults. Demo credentials only, not for production.
 
@@ -73,6 +95,16 @@ npm start
 
 With `ng serve`, configure a dev proxy or run the full Docker stack so `/api` resolves.
 
+## Tech stack
+
+| Layer | Technologies |
+|-------|----------------|
+| Backend | Kotlin, Java 21, Spring Boot 3.4, JPA, Flyway |
+| Database | PostgreSQL 16 |
+| Frontend | Angular 19, Angular Material |
+| Infra | Docker Compose, nginx |
+| Tests | JUnit, Karma, Playwright |
+
 ## Architecture
 
 ```mermaid
@@ -82,13 +114,6 @@ flowchart LR
   Nginx -->|"/"| Angular
   Backend --> Postgres
 ```
-
-| Layer | Stack |
-|-------|-------|
-| Database | PostgreSQL 16, Flyway migrations |
-| Backend | Java 21, Kotlin, Spring Boot 3.4, JPA, Validation, Actuator, Springdoc |
-| Frontend | Angular 19, Angular Material, nginx reverse proxy |
-| API format | JSON, snake_case field names |
 
 **Backend packages:** `allocation/` (pure Kotlin matcher), `domain/`, `service/`, `api/`, `config/`.
 
@@ -101,7 +126,7 @@ flowchart LR
 | `/allocations/new` | Policy builder |
 | `/allocations/:id` | Detail, confirm/cancel |
 
-Browser calls `/api/...`; nginx strips the prefix and forwards to Spring Boot (no context path).
+Browser calls `/api/...`; nginx strips the prefix and forwards to Spring Boot.
 
 ## API summary
 
@@ -122,108 +147,27 @@ Errors: `{ "message": "...", "field_errors": { "field": "..." } }`.
 
 ## Allocation algorithm
 
-### Problem
+SetupMatch assigns each policy slot exactly one distinct **available** unit:
 
-Assign each policy slot exactly one distinct **available** equipment unit such that:
+- **Hard constraints:** type matches; `condition_score >= min_condition` when set
+- **Soft scoring:** brand preference and purchase recency
+- **Global:** each equipment item used at most once across all slots
 
-- **Hard:** type matches; `condition_score >= min_condition` when set.
-- **Soft:** maximize total score from brand preference and purchase recency.
-- **Global:** each equipment used at most once across all slots.
+The matcher uses the **Hungarian algorithm** in pure Kotlin (`HungarianAllocator`, no Spring dependency), parallelized by equipment type. Greedy per-slot picking can block later slots; global matching avoids partial kits.
 
-### Approach
+## Contributing
 
-1. Load available candidates (exclude reserved, assigned, retired).
-2. Build weighted edges for every slot/candidate pair that passes hard filters:
+Issues and pull requests are welcome on [GitHub](https://github.com/tomaszs/setupmatch). For product questions or hosted setup, use the [contact form](https://setupmatch.cloud/contact).
 
-   ```
-   edge_weight = base + brand_bonus + recency_bonus
+Please run backend and frontend tests before opening a PR. CI runs Gradle tests, Karma, Docker build, and Playwright E2E.
 
-   base          = condition_score * 100
-   brand_bonus   = 50 if preferred_brand matches (case-insensitive), else 0
-   recency_bonus = normalized rank by purchase_date among eligible units (0–25)
-   ```
+## Related repositories
 
-3. Find a **maximum total score** assignment with the **Hungarian algorithm** in pure Kotlin (`HungarianAllocator` + `HungarianMatcher`, no Spring dependencies). Slots are grouped by equipment type; each group is solved in parallel.
-
-Complexity: **O(n³)** per type group with **n = max(slots, candidates)** for that type. Policies are small (typically &lt;10 slots), so this is fast in practice even with large inventory pools.
-
-### Why not greedy?
-
-Greedy per-slot assignment can block later slots. Example: two monitor slots where slot 0 requires min condition 0.8 and slot 1 is unconstrained. Inventory: monitors at 0.85, 0.75, 0.70. A greedy pick for slot 1 first may take 0.85 and leave no unit for slot 0. Global matching assigns 0.85 to slot 0 and 0.75 to slot 1. See `CompetingMonitorsTest`.
-
-### Rules
-
-- **All slots or none:** never reserve a subset.
-- **`min_condition` is inclusive.**
-- **Tie-break:** equipment `id` for deterministic tests.
-
-## State machines
-
-### Equipment
-
-```
-available ──(allocate)──> reserved ──(confirm)──> assigned
-    ^                         |
-    └────────(cancel)─────────┘
-
-available ──(retire)──> retired
-```
-
-- Reserve on successful allocation.
-- Assign on confirm.
-- Release to available on cancel (allocated requests only).
-- Retire only from available.
-
-### Allocation request
-
-There is no persisted `created` state. `POST /allocations` runs the allocator synchronously:
-
-```
-POST /allocations ──> allocated   (equipment reserved)
-                   └─> failed     (failure_reason set)
-
-allocated ──confirm──> confirmed
-allocated ──cancel───> cancelled
-```
-
-Confirm and cancel are allowed only when `state === allocated`. Terminal states: `failed`, `confirmed`, `cancelled`.
-
-## Testing
-
-```powershell
-cd backend
-./gradlew test
-```
-
-| Test | Coverage |
-|------|----------|
-| `CompetingMonitorsTest` | Optimal global matching on competing monitor slots |
-| `HardConstraintFailureTest` | min_condition enforcement |
-| `RetiredEquipmentExcludedTest` | Retired units never selected |
-| `AllocationFlowIT` | Create → confirm → assigned integration path |
-| `QaScenariosIT` | Automated coverage for manual QA scenarios A–H (API) |
-| `e2e/tests/*.spec.ts` | Playwright UI flows: inventory, allocate, fail, cancel, brand suggestions |
-
-CI (`.github/workflows/ci.yml`): Gradle test, frontend Karma tests, `docker compose build`, then Playwright E2E against the running stack.
-
-## Decisions and trade-offs
-
-| Decision | Rationale |
-|----------|-----------|
-| Hungarian matcher | Optimal assignment under soft scores; parallel by equipment type; O(n³) per type group |
-| Sync allocation on POST | Simpler ops flow; no message broker in compose |
-| Retire bonus | Maps to disposal lifecycle; demo-friendly |
-| No auth | Out of scope for v1 assignment |
-| nginx `/api` proxy | Same-origin frontend; minimal CORS in Docker |
-| snake_case JSON | Matches backend DTO naming strategy |
-
-## Out of scope (v1)
-
-Authentication, multi-tenancy, async event bus, production hardening.
+| Repo | Purpose |
+|------|---------|
+| [tomaszs/setupmatch](https://github.com/tomaszs/setupmatch) | This app (inventory + allocation) |
+| [tomaszs/setupmatch-web](https://github.com/tomaszs/setupmatch-web) | Marketing site at setupmatch.cloud |
 
 ## License
 
-All rights reserved. See [LICENSE](LICENSE).
-
-No use of this software is permitted without prior written permission from Tomasz Smykowski. This includes any use by artificial intelligence systems. Unauthorized use incurs liquidated damages of USD $5,000 per occurrence.
-
+Proprietary. See [LICENSE](LICENSE). No use without prior written permission from Tomasz Smykowski.
